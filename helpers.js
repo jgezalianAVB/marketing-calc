@@ -207,8 +207,10 @@ function calculateFBBudget() {
   const googleFactor =
     parseNumber(document.getElementById("google-factor").textContent) / 100;
 
+  // Correctly calculate the emailPercentage
+  const emailPercentageText = document.getElementById("email-percentage").textContent.replace('%', '');
+  const emailPercentage = parseFloat(emailPercentageText) / 100 || 0;
 
-  const emailPercentage = parseInt(document.getElementById("email-percentage").innerText);
   let fbFactor;
   if (actAnnualBudget < 28572) {
     fbFactor = 0 - emailPercentage;
@@ -220,23 +222,12 @@ function calculateFBBudget() {
     fbFactor = 0.2;
   }
 
-  document.getElementById("fb-factor").textContent = `${(
-    fbFactor * 100
-  ).toFixed(0)}%`;
+  document.getElementById("fb-factor").textContent = `${(fbFactor * 100).toFixed(2)}%`;
 
   const monthlyIds = [
-    "evergreen-jan",
-    "evergreen-feb",
-    "evergreen-mar",
-    "evergreen-apr",
-    "evergreen-may",
-    "evergreen-jun",
-    "evergreen-jul",
-    "evergreen-aug",
-    "evergreen-sep",
-    "evergreen-oct",
-    "evergreen-nov",
-    "evergreen-dec",
+    "evergreen-jan", "evergreen-feb", "evergreen-mar", "evergreen-apr",
+    "evergreen-may", "evergreen-jun", "evergreen-jul", "evergreen-aug",
+    "evergreen-sep", "evergreen-oct", "evergreen-nov", "evergreen-dec"
   ];
 
   let totalFBBudget = 0;
@@ -245,29 +236,11 @@ function calculateFBBudget() {
     const fbMonthlyValue = fbFactor * evergreenValue;
     totalFBBudget += fbMonthlyValue;
 
-    const fbId = `fb-${[
-        "jan",
-        "feb",
-        "mar",
-        "apr",
-        "may",
-        "jun",
-        "jul",
-        "aug",
-        "sep",
-        "oct",
-        "nov",
-        "dec",
-      ][index]
-      }`;
-    document.getElementById(fbId).textContent = `$${formatNumberWithCommas(
-      fbMonthlyValue
-    )}`;
+    const fbId = `fb-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`;
+    document.getElementById(fbId).textContent = `$${formatNumberWithCommas(fbMonthlyValue)}`;
   });
 
-  document.getElementById("fb-total").textContent = `$${formatNumberWithCommas(
-    totalFBBudget
-  )}`;
+  document.getElementById("fb-total").textContent = `$${formatNumberWithCommas(totalFBBudget)}`;
 }
 
 function calculateEmailBlogSocialBudget() {
