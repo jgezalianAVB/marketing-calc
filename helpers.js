@@ -17,34 +17,24 @@ function formatInputField(fieldId) {
 }
 
 function calculateBudget() {
-  // Get values and convert them to numbers
-  const retailRevenue = parseNumber(
-    document.getElementById("retailRevenue").value
-  );
-  const categoryRevenue1 =
-    parseNumber(document.getElementById("categoryRevenue1").value) / 100;
-  const categoryRevenue2 =
-    parseNumber(document.getElementById("categoryRevenue2").value) / 100;
-  const mrktgRevenue1 =
-    parseNumber(document.getElementById("mrktgRevenue1").value) / 100;
-  const mrktgRevenue2 =
-    parseNumber(document.getElementById("mrktgRevenue2").value) / 100;
+  const retailRevenue = parseNumber(document.getElementById("retailRevenue").value);
+  const categoryRevenue1 = parseNumber(document.getElementById("categoryRevenue1").value) / 100;
+  const categoryRevenue2 = parseNumber(document.getElementById("categoryRevenue2").value) / 100;
 
-  // Calculate the Rec Annual Budget
+  // Marketing percentage is now fixed at 3%
+  const mrktgRevenue1 = 3 / 100;
+  const mrktgRevenue2 = 3 / 100;
+
   const budget1 = retailRevenue * categoryRevenue1 * mrktgRevenue1;
   const budget2 = retailRevenue * categoryRevenue2 * mrktgRevenue2;
   const recAnnualBudget = budget1 + budget2;
 
-  document.getElementById(
-    "recAnnualBudget"
-  ).textContent = `$${formatNumberWithCommas(recAnnualBudget)}`;
-  document.getElementById(
-    "actAnnualBudget"
-  ).placeholder = `$${formatNumberWithCommas(recAnnualBudget)}`;
+  document.getElementById("recAnnualBudget").textContent = `$${formatNumberWithCommas(recAnnualBudget)}`;
+  document.getElementById("actAnnualBudget").placeholder = `$${formatNumberWithCommas(recAnnualBudget)}`;
 
-  // Update Monthly Budget in breakdown-table based on Act Annual Budget
   updateMonthlyBudget();
 }
+
 
 function updateMonthlyBudget() {
   // Get the Act Annual Budget value from the input or placeholder
@@ -89,7 +79,8 @@ function updateMonthlyBudget() {
 
   calculateEvergreenBudget();
   calculateGoogleBudget();
-  calculateEmailBlogSocialBudget();
+  calculateEmailBudget();
+  calculateContentBundleBudget();
   calculateFBBudget();
   calculateSEOBudget();
   calculateOTTBudget();
@@ -243,8 +234,7 @@ function calculateFBBudget() {
   document.getElementById("fb-total").textContent = `$${formatNumberWithCommas(totalFBBudget)}`;
 }
 
-function calculateEmailBlogSocialBudget() {
-  // Get Evergreen Budget values
+function calculateEmailBudget() {
   const monthlyIds = [
     "evergreen-jan", "evergreen-feb", "evergreen-mar", "evergreen-apr",
     "evergreen-may", "evergreen-jun", "evergreen-jul", "evergreen-aug",
@@ -254,38 +244,59 @@ function calculateEmailBlogSocialBudget() {
   let totalEmailBudget = 0;
 
   monthlyIds.forEach((id, index) => {
-    // Get the corresponding Evergreen Budget value
     const evergreenValue = parseNumber(document.getElementById(id).textContent);
-
-    // Determine the Email/Blog/Social budget for the month
     let emailBudget;
-    if (evergreenValue < 9999.99) {
+
+    // New threshold values
+    if (evergreenValue < 1050) {
       emailBudget = 0;
-    } else if (evergreenValue < 13999.99) {
-      emailBudget = 500;
-    } else if (evergreenValue < 26249.99) {
-      emailBudget = 700;
+    } else if (evergreenValue < 2100) {
+      emailBudget = 250;
+    } else if (evergreenValue < 10500) {
+      emailBudget = 600;
     } else {
-      emailBudget = 1250;
+      emailBudget = 1500;
     }
 
     totalEmailBudget += emailBudget;
 
     // Update the respective month cell
-    const emailId = `email-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]
-      }`;
+    const emailId = `email-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`;
     document.getElementById(emailId).textContent = `$${formatNumberWithCommas(emailBudget)}`;
 
-    // Update the first <td> if it's January
+    // Update percentage for the first column
     if (index === 0) {
-      const emailPercentage = evergreenValue > 0 ? emailBudget / evergreenValue : 0;
-      document.getElementById("email-percentage").textContent = `${Math.round((emailPercentage * 100).toFixed(2))}%`;
+      const emailPercentage = evergreenValue > 0 ? (emailBudget / evergreenValue) * 100 : 0;
+      document.getElementById("email-percentage").textContent = `${emailPercentage.toFixed(2)}%`;
     }
   });
 
-  // Update the total for the E-Mail/Blog/Social row
   document.getElementById("email-total").textContent = `$${formatNumberWithCommas(totalEmailBudget)}`;
 }
+
+function calculateContentBundleBudget() {
+  const monthlyIds = [
+    "evergreen-jan", "evergreen-feb", "evergreen-mar", "evergreen-apr",
+    "evergreen-may", "evergreen-jun", "evergreen-jul", "evergreen-aug",
+    "evergreen-sep", "evergreen-oct", "evergreen-nov", "evergreen-dec"
+  ];
+
+  let totalContentBundleBudget = 0;
+
+  monthlyIds.forEach((id, index) => {
+    const evergreenValue = parseNumber(document.getElementById(id).textContent);
+
+    let contentBudget = evergreenValue > 2100 ? 200 : 0;
+    totalContentBundleBudget += contentBudget;
+
+    // Update the respective month cell
+    const contentId = `content-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`;
+    document.getElementById(contentId).textContent = `$${formatNumberWithCommas(contentBudget)}`;
+  });
+
+  document.getElementById("content-total").textContent = `$${formatNumberWithCommas(totalContentBundleBudget)}`;
+}
+
 
 function calculateSEOBudget() {
   // Get Evergreen Budget values
@@ -410,16 +421,18 @@ function calculatePromoBudget() {
 // Integrate E-Mail/Blog/Social Calculation into Existing Workflow
 updateMonthlyBudget = (function (originalFunction) {
   return function () {
-    originalFunction(); // Call the original function
-    calculateEvergreenBudget(); // Ensure Evergreen budgets are recalculated
-    calculateGoogleBudget(); // Ensure Google/YouTube budgets are recalculated
-    calculateEmailBlogSocialBudget(); // Calculate E-Mail/Blog/Social budgets
-    calculateFBBudget(); // Ensure FB/IG budgets are recalculated
-    calculateSEOBudget(); 
+    originalFunction();
+    calculateEvergreenBudget();
+    calculateGoogleBudget();
+    calculateEmailBudget();
+    calculateContentBundleBudget();
+    calculateFBBudget();
+    calculateSEOBudget();
     calculateOTTBudget();
     calculatePromoBudget();
   };
 })(updateMonthlyBudget);
+
 
 document
   .getElementById("retailRevenue")
