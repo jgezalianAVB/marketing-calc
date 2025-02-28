@@ -86,8 +86,7 @@ function updateMonthlyBudget() {
   calculateYouTubeBudget()
   calculateOTTBudget();
   calculateBudgetPercentages();
-  
-  // calculatePromoBudget();
+  calculatePromoBudget();
 }
 
 function calculateEvergreenBudget() {
@@ -440,7 +439,7 @@ updateMonthlyBudget = (function (originalFunction) {
     calculateYouTubeBudget()
     calculateOTTBudget();
     calculateBudgetPercentages();
-    // calculatePromoBudget();
+    calculatePromoBudget();
   };
 })(updateMonthlyBudget);
 
