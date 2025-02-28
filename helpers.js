@@ -78,13 +78,16 @@ function updateMonthlyBudget() {
   ).textContent = `$${formatNumberWithCommas(totalBudget)}`;
 
   calculateEvergreenBudget();
-  calculateGoogleBudget();
   calculateEmailBudget();
   calculateContentBundleBudget();
-  calculateFBBudget();
   calculateSEOBudget();
+  calculateGoogleBudget();
+  calculateFBBudget();
+  calculateYouTubeBudget()
   calculateOTTBudget();
-  calculatePromoBudget();
+  calculateBudgetPercentages();
+  
+  // calculatePromoBudget();
 }
 
 function calculateEvergreenBudget() {
@@ -123,98 +126,50 @@ function calculateEvergreenBudget() {
 }
 
 function calculateGoogleBudget() {
-  const actAnnualBudget = parseNumber(
-    document.getElementById("actAnnualBudget").value ||
-    document.getElementById("actAnnualBudget").placeholder
-  );
-
-  let googleFactor;
-  if (actAnnualBudget < 28572) {
-    googleFactor = 1;
-  } else if (actAnnualBudget < 42858) {
-    googleFactor = 0.8;
-  } else if (actAnnualBudget < 228599.99) {
-    googleFactor = 0.7;
-  } else {
-    googleFactor = 0.6;
-  }
-
-  document.getElementById("google-factor").textContent = `${(
-    googleFactor * 100
-  ).toFixed(0)}%`;
-
   const monthlyIds = [
-    "evergreen-jan",
-    "evergreen-feb",
-    "evergreen-mar",
-    "evergreen-apr",
-    "evergreen-may",
-    "evergreen-jun",
-    "evergreen-jul",
-    "evergreen-aug",
-    "evergreen-sep",
-    "evergreen-oct",
-    "evergreen-nov",
-    "evergreen-dec",
+    "evergreen-jan", "evergreen-feb", "evergreen-mar", "evergreen-apr",
+    "evergreen-may", "evergreen-jun", "evergreen-jul", "evergreen-aug",
+    "evergreen-sep", "evergreen-oct", "evergreen-nov", "evergreen-dec"
   ];
 
   let totalGoogleBudget = 0;
+
   monthlyIds.forEach((id, index) => {
     const evergreenValue = parseNumber(document.getElementById(id).textContent);
-    const googleMonthlyValue = googleFactor * evergreenValue;
-    totalGoogleBudget += googleMonthlyValue;
+    const emailValue = parseNumber(document.getElementById(`email-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`).textContent);
+    const seoValue = parseNumber(document.getElementById(`seo-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`).textContent);
+    const contentValue = parseNumber(document.getElementById(`content-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`).textContent);
+    let googleBudget = 0;
 
-    const googleId = `google-${[
-        "jan",
-        "feb",
-        "mar",
-        "apr",
-        "may",
-        "jun",
-        "jul",
-        "aug",
-        "sep",
-        "oct",
-        "nov",
-        "dec",
-      ][index]
-      }`;
-    document.getElementById(googleId).textContent = `$${formatNumberWithCommas(
-      googleMonthlyValue
-    )}`;
+    if (evergreenValue < 2999) {
+      googleBudget = evergreenValue;
+    } else if (evergreenValue >= 3000 && evergreenValue <= 5249) {
+      googleBudget = evergreenValue - emailValue;
+    } else if (evergreenValue >= 5250 && evergreenValue <= 14999) {
+      googleBudget = 0.8 * (evergreenValue - (emailValue + contentValue));
+    } 
+    else if (evergreenValue >= 15000 && evergreenValue <= 20999) {
+      googleBudget = 0.7 * (evergreenValue - (emailValue + contentValue));
+    } 
+
+    else if (evergreenValue >= 21000 && evergreenValue <= 49999) {
+      googleBudget = 0.7 * (evergreenValue - (emailValue + contentValue + seoValue));
+    } 
+
+    else {
+      googleBudget = 0.6 * (evergreenValue - (emailValue + seoValue + contentValue));
+    }
+
+    totalGoogleBudget += googleBudget;
+
+    const googleId = `google-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`;
+    document.getElementById(googleId).textContent = `$${formatNumberWithCommas(googleBudget)}`;
   });
 
-  document.getElementById(
-    "google-total"
-  ).textContent = `$${formatNumberWithCommas(totalGoogleBudget)}`;
+  document.getElementById("google-total").textContent = `$${formatNumberWithCommas(totalGoogleBudget)}`;
 }
 
 function calculateFBBudget() {
-  const actAnnualBudget = parseNumber(
-    document.getElementById("actAnnualBudget").value ||
-    document.getElementById("actAnnualBudget").placeholder
-  );
-
-  const googleFactor =
-    parseNumber(document.getElementById("google-factor").textContent) / 100;
-
-  // Correctly calculate the emailPercentage
-  const emailPercentageText = document.getElementById("email-percentage").textContent.replace('%', '');
-  const emailPercentage = parseFloat(emailPercentageText) / 100 || 0;
-
-  let fbFactor;
-  if (actAnnualBudget < 28572) {
-    fbFactor = 0 - emailPercentage;
-  } else if (actAnnualBudget < 42858) {
-    fbFactor = 0.2 - emailPercentage;
-  } else if (actAnnualBudget < 228599.99) {
-    fbFactor = 0.3 - emailPercentage;
-  } else {
-    fbFactor = 0.2;
-  }
-
-  document.getElementById("fb-factor").textContent = `${(fbFactor * 100).toFixed(2)}%`;
-
   const monthlyIds = [
     "evergreen-jan", "evergreen-feb", "evergreen-mar", "evergreen-apr",
     "evergreen-may", "evergreen-jun", "evergreen-jul", "evergreen-aug",
@@ -222,13 +177,33 @@ function calculateFBBudget() {
   ];
 
   let totalFBBudget = 0;
+
   monthlyIds.forEach((id, index) => {
     const evergreenValue = parseNumber(document.getElementById(id).textContent);
-    const fbMonthlyValue = fbFactor * evergreenValue;
-    totalFBBudget += fbMonthlyValue;
+    const emailValue = parseNumber(document.getElementById(`email-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`).textContent);
+    const contentValue = parseNumber(document.getElementById(`content-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`).textContent);
+    const seoValue = parseNumber(document.getElementById(`seo-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`).textContent);
+    let fbBudget = 0;
+
+    if (evergreenValue < 5250) {
+      fbBudget = 0;
+    } else if (evergreenValue >= 5250 && evergreenValue <= 14999) {
+      fbBudget = 0.1 * (evergreenValue - (emailValue + contentValue));
+    
+    } 
+    
+    else if (evergreenValue >= 15000 && evergreenValue <= 20999) {
+      fbBudget = 0.15 * (evergreenValue - (emailValue + contentValue));
+    }
+    
+    else {
+      fbBudget = 0.1 * (evergreenValue - (seoValue + emailValue + contentValue));
+    }
+
+    totalFBBudget += fbBudget;
 
     const fbId = `fb-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`;
-    document.getElementById(fbId).textContent = `$${formatNumberWithCommas(fbMonthlyValue)}`;
+    document.getElementById(fbId).textContent = `$${formatNumberWithCommas(fbBudget)}`;
   });
 
   document.getElementById("fb-total").textContent = `$${formatNumberWithCommas(totalFBBudget)}`;
@@ -245,16 +220,16 @@ function calculateEmailBudget() {
 
   monthlyIds.forEach((id, index) => {
     const evergreenValue = parseNumber(document.getElementById(id).textContent);
-    let emailBudget;
+    let emailBudget = 0;
 
-    // New threshold values
-    if (evergreenValue < 1050) {
+    if(evergreenValue < 2999) {
       emailBudget = 0;
-    } else if (evergreenValue < 2100) {
+    }
+    if (evergreenValue >= 3000 && evergreenValue <= 5249) {
       emailBudget = 250;
-    } else if (evergreenValue < 10500) {
+    } else if (evergreenValue >= 5250 && evergreenValue <= 14999) {
       emailBudget = 600;
-    } else {
+    } else if (evergreenValue >= 14999) {
       emailBudget = 1500;
     }
 
@@ -263,16 +238,11 @@ function calculateEmailBudget() {
     // Update the respective month cell
     const emailId = `email-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`;
     document.getElementById(emailId).textContent = `$${formatNumberWithCommas(emailBudget)}`;
-
-    // Update percentage for the first column
-    if (index === 0) {
-      const emailPercentage = evergreenValue > 0 ? (emailBudget / evergreenValue) * 100 : 0;
-      document.getElementById("email-percentage").textContent = `${emailPercentage.toFixed(2)}%`;
-    }
   });
 
   document.getElementById("email-total").textContent = `$${formatNumberWithCommas(totalEmailBudget)}`;
 }
+
 
 function calculateContentBundleBudget() {
   const monthlyIds = [
@@ -281,25 +251,27 @@ function calculateContentBundleBudget() {
     "evergreen-sep", "evergreen-oct", "evergreen-nov", "evergreen-dec"
   ];
 
-  let totalContentBundleBudget = 0;
+  let totalContentBudget = 0;
 
   monthlyIds.forEach((id, index) => {
     const evergreenValue = parseNumber(document.getElementById(id).textContent);
+    let contentBudget = 0;
 
-    let contentBudget = evergreenValue > 2100 ? 200 : 0;
-    totalContentBundleBudget += contentBudget;
+    if (evergreenValue >= 5250) {
+      contentBudget = 200;
+    }
 
-    // Update the respective month cell
+    totalContentBudget += contentBudget;
+
     const contentId = `content-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`;
     document.getElementById(contentId).textContent = `$${formatNumberWithCommas(contentBudget)}`;
   });
 
-  document.getElementById("content-total").textContent = `$${formatNumberWithCommas(totalContentBundleBudget)}`;
+  document.getElementById("content-total").textContent = `$${formatNumberWithCommas(totalContentBudget)}`;
 }
 
 
 function calculateSEOBudget() {
-  // Get Evergreen Budget values
   const monthlyIds = [
     "evergreen-jan", "evergreen-feb", "evergreen-mar", "evergreen-apr",
     "evergreen-may", "evergreen-jun", "evergreen-jul", "evergreen-aug",
@@ -309,70 +281,96 @@ function calculateSEOBudget() {
   let totalSEOBudget = 0;
 
   monthlyIds.forEach((id, index) => {
-    // Get the corresponding Evergreen Budget value
     const evergreenValue = parseNumber(document.getElementById(id).textContent);
+    let seoBudget = 0;
 
-    // Determine the SEO budget for the month
-    let seoBudget;
-    if (evergreenValue < 24999.99) {
-      seoBudget = 0;
-    } else if (evergreenValue < 49999.99) {
-      seoBudget = 2000;
-    } else if (evergreenValue > 50000) {
+    if (evergreenValue >= 21000 && evergreenValue <= 49999) {
+      seoBudget = 3000;
+    } else if (evergreenValue >= 50000) {
       seoBudget = 5000;
     }
 
     totalSEOBudget += seoBudget;
 
-    // Update the respective month cell
-    const seoId = `seo-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]
-      }`;
+    const seoId = `seo-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`;
     document.getElementById(seoId).textContent = `$${formatNumberWithCommas(seoBudget)}`;
-
-    // Update the first <td> if it's January
-    if (index === 0) {
-      const seoPercentage = seoBudget / evergreenValue;
-      document.getElementById("seo-percentage").textContent = `${Math.round((seoPercentage * 100).toFixed(2))}%`;
-    }
   });
 
-  // Update the total for the seo row
   document.getElementById("seo-total").textContent = `$${formatNumberWithCommas(totalSEOBudget)}`;
+}
+
+function calculateYouTubeBudget() {
+  const monthlyIds = [
+    "evergreen-jan", "evergreen-feb", "evergreen-mar", "evergreen-apr",
+    "evergreen-may", "evergreen-jun", "evergreen-jul", "evergreen-aug",
+    "evergreen-sep", "evergreen-oct", "evergreen-nov", "evergreen-dec"
+  ];
+
+  let totalYouTubeBudget = 0;
+
+  monthlyIds.forEach((id, index) => {
+    const evergreenValue = parseNumber(document.getElementById(id).textContent);
+    const emailValue = parseNumber(document.getElementById(`email-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`).textContent);
+    const contentValue = parseNumber(document.getElementById(`content-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`).textContent);
+    const seoValue = parseNumber(document.getElementById(`seo-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`).textContent);
+    let ytBudget = 0;
+
+    if (evergreenValue < 5250) {
+      ytBudget = 0;
+    } else if (evergreenValue >= 5250 && evergreenValue <= 14999) {
+      ytBudget = 0.1 * (evergreenValue - (emailValue + contentValue));
+    
+    } 
+    
+    else if (evergreenValue >= 15000 && evergreenValue <= 20999) {
+      ytBudget = 0.15 * (evergreenValue - (emailValue + contentValue));
+    }
+    else if (evergreenValue >= 21000 && evergreenValue <= 49999) {
+      ytBudget = 0.1 * (evergreenValue - (emailValue + contentValue + seoValue));
+    }
+    
+    else {
+      ytBudget = 0.2 * (evergreenValue - (seoValue + emailValue + contentValue));
+    }
+
+    totalYouTubeBudget += ytBudget;
+
+    const ytId = `youtube-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`;
+    document.getElementById(ytId).textContent = `$${formatNumberWithCommas(ytBudget)}`;
+  });
+
+  document.getElementById("youtube-total").textContent = `$${formatNumberWithCommas(totalYouTubeBudget)}`;
 }
 
 function calculateOTTBudget() {
   const monthlyIds = [
-    "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"
+    "evergreen-jan", "evergreen-feb", "evergreen-mar", "evergreen-apr",
+    "evergreen-may", "evergreen-jun", "evergreen-jul", "evergreen-aug",
+    "evergreen-sep", "evergreen-oct", "evergreen-nov", "evergreen-dec"
   ];
 
   let totalOTTBudget = 0;
 
-  monthlyIds.forEach((month) => {
-    const evergreenValue = parseNumber(document.getElementById(`evergreen-${month}`).textContent);
+  monthlyIds.forEach((id, index) => {
+    const evergreenValue = parseNumber(document.getElementById(id).textContent);
+    const emailValue = parseNumber(document.getElementById(`email-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`).textContent);
+    const contentValue = parseNumber(document.getElementById(`content-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`).textContent);
+    const seoValue = parseNumber(document.getElementById(`seo-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`).textContent);
 
-    // Calculate the sum of other budgets (Google, FB/IG, E-Mail/Blog/Social, SEO)
-    const googleValue = parseNumber(document.getElementById(`google-${month}`).textContent);
-    const fbValue = parseNumber(document.getElementById(`fb-${month}`).textContent);
-    const emailValue = parseNumber(document.getElementById(`email-${month}`).textContent);
-    const seoValue = parseNumber(document.getElementById(`seo-${month}`).textContent);
+    let ottBudget = 0;
 
-    const totalOtherBudgets = googleValue + fbValue + emailValue + seoValue;
-
-    // Calculate the OTT budget for the month
-    const ottValue = evergreenValue - totalOtherBudgets;
-    totalOTTBudget += ottValue;
-
-    // Update the respective month cell in the OTT row
-    document.getElementById(`ott-${month}`).textContent = `$${formatNumberWithCommas(ottValue)}`;
-
-    // Update the percentage in the first <td> if it's January
-    if (month === "jan") {
-      const ottPercentage = evergreenValue > 0 ? (ottValue / evergreenValue) * 100 : 0;
-      document.getElementById("ott-percentage").textContent = `${Math.round(ottPercentage.toFixed(2))}%`;
+    if (evergreenValue < 21000) {
+      ottBudget = 0;
+    } else {
+      ottBudget = 0.1 * (evergreenValue - (emailValue + contentValue + seoValue));
     }
+
+    totalOTTBudget += ottBudget;
+
+    const ottId = `ott-${["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"][index]}`;
+    document.getElementById(ottId).textContent = `$${formatNumberWithCommas(ottBudget)}`;
   });
 
-  // Update the total for the OTT row
   document.getElementById("ott-total").textContent = `$${formatNumberWithCommas(totalOTTBudget)}`;
 }
 
@@ -418,18 +416,31 @@ function calculatePromoBudget() {
   document.getElementById("promo-total").textContent = `$${formatNumberWithCommas(promoTotal)}`;
 }
 
+function calculateBudgetPercentages() {
+  const services = ["email", "content", "seo", "google", "fb", "youtube", "ott"];
+  const evergreenValue = parseNumber(document.getElementById("evergreen-total").textContent);
+
+  services.forEach(service => {
+    const serviceValue = parseNumber(document.getElementById(`${service}-total`).textContent);
+    let percentage = evergreenValue > 0 ? (serviceValue / evergreenValue) * 100 : 0;
+    document.getElementById(`${service}-percentage`).textContent = `${percentage.toFixed(2)}%`;
+  });
+}
+
 // Integrate E-Mail/Blog/Social Calculation into Existing Workflow
 updateMonthlyBudget = (function (originalFunction) {
   return function () {
     originalFunction();
     calculateEvergreenBudget();
-    calculateGoogleBudget();
     calculateEmailBudget();
     calculateContentBundleBudget();
-    calculateFBBudget();
     calculateSEOBudget();
+    calculateGoogleBudget();
+    calculateFBBudget();
+    calculateYouTubeBudget()
     calculateOTTBudget();
-    calculatePromoBudget();
+    calculateBudgetPercentages();
+    // calculatePromoBudget();
   };
 })(updateMonthlyBudget);
 
