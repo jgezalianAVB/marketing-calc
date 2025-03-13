@@ -18,16 +18,15 @@ function formatInputField(fieldId) {
 
 function calculateBudget() {
   const retailRevenue = parseNumber(document.getElementById("retailRevenue").value);
-  const categoryRevenue1 = parseNumber(document.getElementById("categoryRevenue1").value) / 100;
-  const categoryRevenue2 = parseNumber(document.getElementById("categoryRevenue2").value) / 100;
+  console.log(retailRevenue)
+  // const categoryRevenue1 = parseNumber(document.getElementById("categoryRevenue1").value) / 100;
+  // const categoryRevenue2 = parseNumber(document.getElementById("categoryRevenue2").value) / 100;
 
   // Marketing percentage is now fixed at 3%
-  const mrktgRevenue1 = 3 / 100;
-  const mrktgRevenue2 = 3 / 100;
+  const mrktgRevenue = 3 / 100;
 
-  const budget1 = retailRevenue * categoryRevenue1 * mrktgRevenue1;
-  const budget2 = retailRevenue * categoryRevenue2 * mrktgRevenue2;
-  const recAnnualBudget = budget1 + budget2;
+  const recAnnualBudget = retailRevenue * mrktgRevenue;
+  // const budget2 = retailRevenue * categoryRevenue2 * mrktgRevenue2;
 
   document.getElementById("recAnnualBudget").textContent = `$${formatNumberWithCommas(recAnnualBudget)}`;
   document.getElementById("actAnnualBudget").placeholder = `$${formatNumberWithCommas(recAnnualBudget)}`;
