@@ -44,7 +44,7 @@ function updateMonthlyBudget() {
 
   // Monthly percentages for each month
   const monthlyPercentages = [
-    0.07, 0.08, 0.07, 0.07, 0.09, 0.09, 0.1, 0.09, 0.09, 0.07, 0.12, 0.07,
+    0.07, 0.08, 0.07, 0.07, 0.09, 0.09, 0.1, 0.085, 0.085, 0.07, 0.12, 0.07,
   ];
   let totalBudget = 0;
 
@@ -397,18 +397,25 @@ function calculatePromoBudget() {
 
   // Calculate individual promotion budgets
   const presDay = febBudget - febEvergreen;
-  const memDay = (mayBudget - mayEvergreen) + 0.5 * (juneBudget - juneEvergreen);
-  const july4th = 0.5 * (juneBudget - juneEvergreen) + (julyBudget - julyEvergreen);
-  const laborDay = (augBudget - augEvergreen) + (septBudget - septEvergreen);
+  //const memDay = (mayBudget - mayEvergreen) + 0.5 * (juneBudget - juneEvergreen);
+  const memDay = (mayBudget - mayEvergreen)
+  const junePromo = (juneBudget - juneEvergreen)
+  //const july4th = 0.5 * (juneBudget - juneEvergreen) + (julyBudget - julyEvergreen);
+  const july4th = (julyBudget - julyEvergreen)
+  const augPromo = (augBudget - augEvergreen)
+  //const laborDay = (augBudget - augEvergreen) + (septBudget - septEvergreen);
+  const laborDay = (septBudget - septEvergreen)
   const blackFriday = novBudget - novEvergreen;
 
   // Calculate total promo budget
-  const promoTotal = presDay + memDay + july4th + laborDay + blackFriday;
+  const promoTotal = presDay + memDay + junePromo + july4th + augPromo + laborDay + blackFriday;
 
   // Update the DOM with calculated values
   document.getElementById("pres-day").textContent = `$${formatNumberWithCommas(presDay)}`;
   document.getElementById("mem-day").textContent = `$${formatNumberWithCommas(memDay)}`;
+  document.getElementById("june-promo").textContent = `$${formatNumberWithCommas(junePromo)}`;
   document.getElementById("july-4").textContent = `$${formatNumberWithCommas(july4th)}`;
+  document.getElementById("aug-promo").textContent = `$${formatNumberWithCommas(augPromo)}`;
   document.getElementById("labor-day").textContent = `$${formatNumberWithCommas(laborDay)}`;
   document.getElementById("black-friday").textContent = `$${formatNumberWithCommas(blackFriday)}`;
   document.getElementById("promo-total").textContent = `$${formatNumberWithCommas(promoTotal)}`;
